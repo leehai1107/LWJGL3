@@ -3,6 +3,7 @@ package mainEngine.core.utils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -23,17 +24,22 @@ public class Utils {
         return bufer;
     }
 
-    public static String loadResource(String filename) throws Exception {
-        String result;
+    public static String loadResource(String filename) throws IOException {
         try (InputStream in = Utils.class.getResourceAsStream(filename)) {
             if (in == null) {
                 throw new FileNotFoundException("Resource not found: " + filename);
             }
+
             try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name())) {
-                result = scanner.useDelimiter("\\A").next();
+                if (scanner.hasNext()) {
+                    return scanner.useDelimiter("\\A").next();
+                } else {
+                    throw new IOException("Empty file: " + filename);
+                }
             }
         }
-        return result;
     }
+
+
 }
 
