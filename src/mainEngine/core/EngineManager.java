@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 
 public class EngineManager {
     public static final long NANO_SECOND = 1000000000L;
-    public static final float FRAME_RATE = 1000;
+    public static final float FRAME_RATE = 60;
 
     private static int fps;
     private static final float frameTime = 1.0f/ FRAME_RATE;

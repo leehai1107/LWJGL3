@@ -1,11 +1,13 @@
 package mainEngine.launcher;
 
+import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.Model;
 import mainEngine.core.Entities.Texture;
 import mainEngine.core.ILogic;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.RenderManager;
 import mainEngine.core.WindowManager;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -18,7 +20,7 @@ public class TestLauncher implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private Model model;
+    private Entity entity;
 
     public TestLauncher() {
         renderer = new RenderManager();
@@ -48,8 +50,9 @@ public class TestLauncher implements ILogic {
           1,1,
           1,0
         };
-        model = loader.loadModel(vertices,textureCoords,indices);
+        Model model  = loader.loadModel(vertices,textureCoords,indices);
         model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")));
+        entity = new Entity(model, new Vector3f(1,0,0), new Vector3f(0,0,0),1);
     }
 
     @Override
@@ -70,6 +73,9 @@ public class TestLauncher implements ILogic {
         }else if( colour <= 0){
             colour = 0.0f;
         }
+        if(entity.getPos().x < -1.5f)
+            entity.getPos().x = 1.5f;
+        entity.getPos().x -= 0.01f;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class TestLauncher implements ILogic {
         }
 
         window.setClearColour(colour,colour,colour,0.0f);
-        renderer.render(model);
+        renderer.render(entity);
     }
 
     @Override
