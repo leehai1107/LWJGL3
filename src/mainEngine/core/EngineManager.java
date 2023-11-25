@@ -10,7 +10,7 @@ public class EngineManager {
     public static final float FRAME_RATE = 1000;
 
     private static int fps;
-    private static float frameTime = 1.0f/ FRAME_RATE;
+    private static final float frameTime = 1.0f/ FRAME_RATE;
 
     private boolean isRunning;
 

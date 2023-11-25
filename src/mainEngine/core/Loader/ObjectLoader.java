@@ -59,7 +59,7 @@ public class ObjectLoader {
         }
 
         for(int vbo : vbos){
-            GL30.glDeleteVertexArrays(vbo);
+            GL30.glDeleteBuffers(vbo);
         }
     }
 }

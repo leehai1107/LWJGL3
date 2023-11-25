@@ -38,11 +38,11 @@ public class TestLauncher implements ILogic {
                 -0.5f, 0.5f, 0f
         };
 
-        int[] indicies = {
-          0,1,3,
-          3,1,2
+        int[] indices = {
+                0,1,3,//top left triangle (v0, v1, v3)
+                3,1,2//bottom right triangle (v3, v1, v2)
         };
-        model = loader.loadModel(vertices,indicies);
+        model = loader.loadModel(vertices,indices);
     }
 
     @Override
