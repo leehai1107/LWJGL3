@@ -1,6 +1,7 @@
 package mainEngine.launcher;
 
 import mainEngine.core.Entities.Model;
+import mainEngine.core.Entities.Texture;
 import mainEngine.core.ILogic;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.RenderManager;
@@ -30,19 +31,25 @@ public class TestLauncher implements ILogic {
         renderer.init();
 
         float[] vertices = {
-                -0.5f, 0.5f, 0f,
+                -0.5f,  0.5f, 0f,
                 -0.5f, -0.5f, 0f,
                 0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f,
-                -0.5f, 0.5f, 0f
+                0.5f,  0.5f, 0f,
         };
 
         int[] indices = {
                 0,1,3,//top left triangle (v0, v1, v3)
                 3,1,2//bottom right triangle (v3, v1, v2)
         };
-        model = loader.loadModel(vertices,indices);
+
+        float[] textureCoords = {
+          0,0,
+          0,1,
+          1,1,
+          1,0
+        };
+        model = loader.loadModel(vertices,textureCoords,indices);
+        model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")));
     }
 
     @Override
