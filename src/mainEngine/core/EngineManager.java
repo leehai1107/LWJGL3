@@ -89,7 +89,7 @@ public class EngineManager {
     }
 
     private void update(){
-        gameLogic.update();
+        gameLogic.update(frameTime);
     }
 
     private void cleanUp(){
