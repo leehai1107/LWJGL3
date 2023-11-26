@@ -4,7 +4,7 @@ public interface ILogic {
 
     void init() throws Exception;
     void input();
-    void update();
+    void update(float interval);
     void render();
     void cleanUp();
 }
