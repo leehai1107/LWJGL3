@@ -10,7 +10,7 @@ public class Launcher {
     private static TestLauncher game;
 
     public static void main(String[] args) {
-        window = new WindowManager(Consts.TITLE, Consts.WIDTH, Consts.HEIGHT, false);
+        window = new WindowManager(Consts.TITLE, Consts.WIDTH, Consts.HEIGHT, true);
         game = new TestLauncher();
         EngineManager engine = new EngineManager();
 
