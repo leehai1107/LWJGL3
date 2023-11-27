@@ -7,14 +7,16 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 
 public class EngineManager {
     public static final long NANO_SECOND = 1000000000L;
-    public static final float FRAME_RATE = 60;
+    public static float FRAME_RATE = 60;
 
     private static int fps;
-    private static final float frameTime = 1.0f/ FRAME_RATE;
+    private static float frameTime = 1.0f/ FRAME_RATE;
+    public static float currentFrameTime = 0;
 
     private boolean isRunning;
 
     private WindowManager window;
+    private MouseInput mouseInput;
     private GLFWErrorCallback errorCallback;
     private ILogic gameLogic;
 
@@ -22,8 +24,10 @@ public class EngineManager {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         window = Launcher.getWindow();
         gameLogic = Launcher.getGame();
+        mouseInput = new MouseInput();
         window.init();
         gameLogic.init();
+        mouseInput.init();
     }
 
     public void start() throws Exception {
@@ -49,7 +53,6 @@ public class EngineManager {
             unprocessedTime += passedTime/ (double) NANO_SECOND;
             frameCounter += passedTime;
 
-           input();
 
             while (unprocessedTime > frameTime) {
                 render = true;
@@ -58,6 +61,7 @@ public class EngineManager {
                     stop();
                 if(frameCounter >= NANO_SECOND) {
                     setFps(frames);
+                    currentFrameTime = 1.0f/fps;
                     window.setTitle(Consts.TITLE +" FPS: "+ getFps());
                     frames = 0;
                     frameCounter = 0;
@@ -65,8 +69,9 @@ public class EngineManager {
             }
 
             if (render){
-                update();
+                update(frameTime,mouseInput);
                 render();
+                input();
                 frames++;
             }
         }
@@ -80,6 +85,7 @@ public class EngineManager {
     }
 
     private void input(){
+        mouseInput.input();
         gameLogic.input();
     }
 
@@ -88,8 +94,8 @@ public class EngineManager {
         window.update();
     }
 
-    private void update(){
-        gameLogic.update(frameTime);
+    private void update(float interval, MouseInput mouseInput){
+        gameLogic.update(interval, mouseInput);
     }
 
     private void cleanUp(){
@@ -97,6 +103,10 @@ public class EngineManager {
         gameLogic.cleanUp();
         errorCallback.free();
         GLFW.glfwTerminate();
+    }
+
+    public static float getFrameTime() {
+        return frameTime;
     }
 
     public static int getFps() {

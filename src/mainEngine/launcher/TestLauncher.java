@@ -1,13 +1,12 @@
 package mainEngine.launcher;
 
-import mainEngine.core.Camera;
+import mainEngine.core.*;
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.Model;
 import mainEngine.core.Entities.Texture;
-import mainEngine.core.ILogic;
 import mainEngine.core.Loader.ObjectLoader;
-import mainEngine.core.RenderManager;
-import mainEngine.core.WindowManager;
+import mainEngine.core.utils.Consts;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -115,10 +114,17 @@ public class TestLauncher implements ILogic {
     }
 
     @Override
-    public void update(float interval) {
+    public void update(float interval, MouseInput mouseInput) {
         camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED,
                 cameraInc.y * CAMERA_MOVE_SPEED,
                 cameraInc.z * CAMERA_MOVE_SPEED);
+
+        if(mouseInput.isLeftButtonPress()){
+
+            Vector2f rotVec = mouseInput.getDisplayVec();
+            camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVE,rotVec.y * Consts.MOUSE_SENSITIVE,0);
+        }
+
         entity.incRotation(0.0f,0.5f,0.0f);
 
     }
