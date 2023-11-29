@@ -38,7 +38,7 @@ public class TestLauncher implements ILogic {
 
 
         Model model  = loader.loadOBJModel("/res/bunny.obj");
-        model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")));
+        model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")),1f);
         entity = new Entity(model, new Vector3f(0,0,-5), new Vector3f(0,0,0),1);
     }
 
@@ -74,7 +74,7 @@ public class TestLauncher implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVE,rotVec.y * Consts.MOUSE_SENSITIVE,0);
         }
 
-        entity.incRotation(0.0f,0.5f,0.0f);
+        entity.incRotation(0.0f,0.25f,0.0f);
 
     }
 
@@ -85,7 +85,6 @@ public class TestLauncher implements ILogic {
             window.setResize(true);
         }
 
-        window.setClearColour(0.0f,0.0f,0.0f,0.0f);
         renderer.render(entity,camera);
     }
 
