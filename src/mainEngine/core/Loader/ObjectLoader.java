@@ -88,7 +88,7 @@ public class ObjectLoader {
 
         int[] indicesArr = indices.stream().mapToInt((Integer v) -> v).toArray();
 
-        return loadModel(verticesArr, texCoordArr, indicesArr);
+        return loadModel(verticesArr, texCoordArr, normalArr, indicesArr);
     }
 
     private static void processVertex(int pos, int texCoord, int normal,
@@ -126,11 +126,12 @@ public class ObjectLoader {
         faces.add(faceVec);
     }
 
-    public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
+    public Model loadModel(float[] vertices, float[] textureCoords, float[] normals, int[] indices) {
         int id = createVAO();
         storeIndicesBuffer(indices);
         storeDataInAttribList(0, 3, vertices);
         storeDataInAttribList(1, 2, textureCoords);
+        storeDataInAttribList(2, 3, normals);
         unbind();
         return new Model(id, indices.length);
     }
