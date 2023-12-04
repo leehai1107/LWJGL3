@@ -2,6 +2,7 @@ package mainEngine.core;
 
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.Model;
+import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.utils.Consts;
 import mainEngine.core.utils.Transformation;
 import mainEngine.core.utils.Utils;
@@ -32,9 +33,11 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
         shader.createUniform("ambientLight");
         shader.createMaterialUniform("material");
+        shader.createUniform("specularPower");
+        shader.createDirectionalLightUniform("directionalLight");
     }
 
-    public void render(Entity entity, Camera camera) {
+    public void render(Entity entity, Camera camera, DirectionalLight directionalLight) {
         clear();
         shader.bind();
         shader.setUniform("textureSampler",0);
@@ -43,6 +46,8 @@ public class RenderManager {
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
         shader.setUniform("material", entity.getModel().getMaterial());
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
+        shader.setUniform("specularPower", Consts.SPECULAR_POWER);
+        shader.setUniform("directionalLight", directionalLight);
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);

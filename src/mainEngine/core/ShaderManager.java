@@ -1,6 +1,7 @@
 package mainEngine.core;
 
 import mainEngine.core.Entities.Material;
+import mainEngine.core.lighting.DirectionalLight;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -39,6 +40,11 @@ public class ShaderManager {
         createUniform(uniformName + ".reflectance");
     }
 
+    public void createDirectionalLightUniform(String uniformName) throws Exception {
+        createUniform(uniformName+".colour");
+        createUniform(uniformName+".direction");
+        createUniform(uniformName+".intensity");
+    }
     public void setUniform(String uniformName, Matrix4f value) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             GL20.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
@@ -74,6 +80,12 @@ public class ShaderManager {
         setUniform(uniformName + ".specular", material.getSpecularColor());
         setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0);
         setUniform(uniformName + ".reflectance", material.getReflectance());
+    }
+
+    public void setUniform(String uniformName, DirectionalLight directionalLight) {
+        setUniform(uniformName+".colour",directionalLight.getColour());
+        setUniform(uniformName+".direction",directionalLight.getDirection());
+        setUniform(uniformName+".intensity",directionalLight.getIntensity());
     }
 
     public void createVertexShader(String shaderCode) throws Exception {
