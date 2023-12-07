@@ -7,6 +7,7 @@ import mainEngine.core.Entities.Texture;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;
+import mainEngine.core.lighting.SpotLight;
 import mainEngine.core.utils.Consts;
 import org.joml.Math;
 import org.joml.Vector2f;
@@ -29,6 +30,7 @@ public class TestLauncher implements ILogic {
     private float lightAngle;
     private DirectionalLight directionalLight;
     private PointLight pointLight;
+    private SpotLight spotLight;
 
     public TestLauncher() {
         renderer = new RenderManager();
@@ -47,9 +49,17 @@ public class TestLauncher implements ILogic {
         model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
         entity = new Entity(model, new Vector3f(0, 0, -5), new Vector3f(0, 0, 0), 1);
         float lightIntensity = 1.0f;
+        //point light
         Vector3f lightPosition = new Vector3f(0, 0, -3.2f);
         Vector3f lightColour = new Vector3f(1, 1, 1);
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity, 0, 0, 1);
+
+        //spotlight
+        Vector3f coneDir = new Vector3f(0, 0, 0);
+        float cutoff = Math.cos(Math.toRadians(180));
+        spotLight = new SpotLight(new PointLight(lightColour, new Vector3f(0, 0, -1f), lightIntensity, 0, 0, 1), coneDir, cutoff);
+
+        //directional light
         lightPosition = new Vector3f(-1, -10, 0);
         lightColour = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
@@ -73,10 +83,18 @@ public class TestLauncher implements ILogic {
         if (window.isKeyPress(GLFW.GLFW_KEY_X))
             cameraInc.y = 1;
 
-        if (window.isKeyPress(GLFW.GLFW_KEY_O))
-            pointLight.getPosition().x += 0.1f;
-        if (window.isKeyPress(GLFW.GLFW_KEY_P))
-            pointLight.getPosition().x -= 0.1f;
+//        if (window.isKeyPress(GLFW.GLFW_KEY_O))
+//            pointLight.getPosition().x += 0.1f;
+//        if (window.isKeyPress(GLFW.GLFW_KEY_P))
+//            pointLight.getPosition().x -= 0.1f;
+
+        float lightPos = spotLight.getPointLight().getPosition().z;
+        if (window.isKeyPress(GLFW.GLFW_KEY_N)) {
+            spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+        }
+        if (window.isKeyPress(GLFW.GLFW_KEY_M)) {
+            spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+        }
 
     }
 
@@ -124,7 +142,7 @@ public class TestLauncher implements ILogic {
             window.setResize(true);
         }
 
-        renderer.render(entity, camera, directionalLight, pointLight);
+        renderer.render(entity, camera, directionalLight, pointLight, spotLight);
     }
 
     @Override
