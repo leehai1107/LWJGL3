@@ -10,10 +10,14 @@ import mainEngine.core.lighting.PointLight;
 import mainEngine.core.lighting.SpotLight;
 import mainEngine.core.utils.Consts;
 import org.joml.Math;
+import org.joml.Random;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestLauncher implements ILogic {
 
@@ -22,7 +26,7 @@ public class TestLauncher implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private Entity entity;
+    private List<Entity> entities;
     private Camera camera;
 
     Vector3f cameraInc;
@@ -47,7 +51,19 @@ public class TestLauncher implements ILogic {
 
         Model model = loader.loadOBJModel("/res/cube.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
-        entity = new Entity(model, new Vector3f(0, 0, -5), new Vector3f(0, 0, 0), 1);
+
+        entities = new ArrayList<>();
+        Random rnd = new Random();
+        for (int i = 0;i<200;i++) {
+            float x = rnd.nextFloat() * 100 -50;
+            float y = rnd.nextFloat() * 100 -50;
+            float z = rnd.nextFloat() * -300;
+            entities.add(new Entity(model, new Vector3f(x,y,z),
+                    new Vector3f(rnd.nextFloat()*180,rnd.nextFloat() *180,0),
+                    1));
+        }
+        entities.add(new Entity(model,new Vector3f(0,0,-2f),new Vector3f(0,0,0),1));
+
         float lightIntensity = 1.0f;
         //point light
         Vector3f lightPosition = new Vector3f(-0.5f, -0.5f, -3.2f);
@@ -62,7 +78,7 @@ public class TestLauncher implements ILogic {
 
         SpotLight spotLight1 = new SpotLight(new PointLight(lightColour, lightPosition,
                 lightIntensity, 0, 0, 1), coneDir, cutoff);
-        spotLight1.getPointLight().setPosition(new Vector3f(0.5f,0.5f,-3.6f));
+        spotLight1.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, -3.6f));
 
 
         //directional light
@@ -152,17 +168,15 @@ public class TestLauncher implements ILogic {
         directionalLight.getDirection().x = (float) Math.sin(angRad);
         directionalLight.getDirection().y = (float) Math.cos(angRad);
 
+        for(Entity entity : entities) {
+            renderer.processEntity(entity);
+        }
+
     }
 
     @Override
     public void render() {
-        //can remove later
-        if (window.isResize()) {
-            GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResize(true);
-        }
-
-        renderer.render(entity, camera, directionalLight, pointLights, spotLights);
+        renderer.render(camera, directionalLight, pointLights, spotLights);
     }
 
     @Override

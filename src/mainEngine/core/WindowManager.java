@@ -90,6 +90,7 @@ public class WindowManager {
     }
 
     public void update() {
+
         GLFW.glfwSwapBuffers(window);
         GLFW.glfwPollEvents();
     }
