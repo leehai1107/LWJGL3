@@ -8,13 +8,13 @@ import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;
 import mainEngine.core.lighting.SpotLight;
+import mainEngine.core.rendering.RenderManager;
 import mainEngine.core.utils.Consts;
 import org.joml.Math;
 import org.joml.Random;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
