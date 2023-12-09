@@ -3,10 +3,12 @@ package mainEngine.core.rendering;
 import mainEngine.core.Camera;
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.Model;
+import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.ShaderManager;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;
 import mainEngine.core.lighting.SpotLight;
+import mainEngine.core.utils.Consts;
 import mainEngine.core.utils.Transformation;
 import mainEngine.core.utils.Utils;
 import mainEngine.launcher.Launcher;
@@ -15,24 +17,26 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EntityRender implements IRenderer{
+public class TerrainRenderer implements IRenderer {
+
 
     ShaderManager shader;
-    private Map<Model, List<Entity>> entities;
+    private List<Terrain> terrains;
 
-    public EntityRender() throws Exception{
-        entities = new HashMap<>();
+    public TerrainRenderer() throws Exception {
+        terrains = new ArrayList<>();
         shader = new ShaderManager();
     }
 
     @Override
     public void init() throws Exception {
-        shader.createVertexShader(Utils.loadResource("/shaders/entity_vertex.vert"));
-        shader.createFragmentShader(Utils.loadResource("/shaders/entity_fragment.frag"));
+        shader.createVertexShader(Utils.loadResource("/shaders/terrain_vertex.vert"));
+        shader.createFragmentShader(Utils.loadResource("/shaders/terrain_fragment.frag"));
         shader.link();
         shader.createUniform("textureSampler");
         shader.createUniform("transformationMatrix");
@@ -42,8 +46,8 @@ public class EntityRender implements IRenderer{
         shader.createMaterialUniform("material");
         shader.createUniform("specularPower");
         shader.createDirectionalLightUniform("directionalLight");
-        shader.createPointLightListUniform("pointLights", 5);
-        shader.createSpotLightListUniform("spotLights", 5);
+        shader.createPointLightListUniform("pointLights", Consts.MAX_POINT_LIGHTS);
+        shader.createSpotLightListUniform("spotLights", Consts.MAX_SPOT_LIGHTS);
 
     }
 
@@ -51,17 +55,14 @@ public class EntityRender implements IRenderer{
     public void render(Camera camera, PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
         shader.bind();
         shader.setUniform("projectionMatrix", Launcher.getWindow().updateProjectionMatrix());
-        RenderManager.renderLights(pointLights, spotLights, directionalLight,shader);
-        for (Model model : entities.keySet()) {
-            bind(model);
-            List<Entity> entitieList = entities.get(model);
-            for (Entity entity : entitieList) {
-                prepare(entity, camera);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-            }
+        RenderManager.renderLights(pointLights, spotLights, directionalLight, shader);
+        for (Terrain terrain : terrains) {
+            bind(terrain.getModel());
+            prepare(terrain, camera);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             unbind();
         }
-        entities.clear();
+        terrains.clear();
         shader.unbind();
     }
 
@@ -85,9 +86,9 @@ public class EntityRender implements IRenderer{
     }
 
     @Override
-    public void prepare(Object entity, Camera camera) {
+    public void prepare(Object terrain, Camera camera) {
         shader.setUniform("textureSampler", 0);
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Entity) entity));
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix((Terrain) terrain));
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
     }
 
@@ -96,7 +97,7 @@ public class EntityRender implements IRenderer{
         shader.cleanUp();
     }
 
-    public Map<Model, List<Entity>> getEntities() {
-        return entities;
+    public List<Terrain> getTerrains() {
+        return terrains;
     }
 }

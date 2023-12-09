@@ -2,41 +2,35 @@ package mainEngine.core.rendering;
 
 import mainEngine.core.Camera;
 import mainEngine.core.Entities.Entity;
-import mainEngine.core.Entities.Model;
+import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.ShaderManager;
 import mainEngine.core.WindowManager;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;
 import mainEngine.core.lighting.SpotLight;
 import mainEngine.core.utils.Consts;
-import mainEngine.core.utils.Transformation;
-import mainEngine.core.utils.Utils;
 import mainEngine.launcher.Launcher;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RenderManager {
 
     private final WindowManager window;
 
-    private EntityRender entityRender;
+    private EntityRenderer entityRenderer;
+    private TerrainRenderer terrainRenderer;
 
     public RenderManager() {
         window = Launcher.getWindow();
     }
 
     public void init() throws Exception {
-        entityRender = new EntityRender();
-
-        entityRender.init();
-
+        entityRenderer = new EntityRenderer();
+        terrainRenderer = new TerrainRenderer();
+        entityRenderer.init();
+        terrainRenderer.init();
     }
 
     public static void renderLights(PointLight[] pointLights, SpotLight[] spotLights,
@@ -64,20 +58,24 @@ public class RenderManager {
             window.setResize(true);
         }
 
-        entityRender.render(camera, pointLights, spotLights, directionalLight);
-
+        entityRenderer.render(camera, pointLights, spotLights, directionalLight);
+        terrainRenderer.render(camera,pointLights,spotLights,directionalLight);
 
     }
 
     public void processEntity(Entity entity) {
-        List<Entity> entityList = entityRender.getEntities().get(entity.getModel());
+        List<Entity> entityList = entityRenderer.getEntities().get(entity.getModel());
         if (entityList != null)
             entityList.add(entity);
         else {
             List<Entity> newEntityList = new ArrayList<>();
             newEntityList.add(entity);
-            entityRender.getEntities().put(entity.getModel(), newEntityList);
+            entityRenderer.getEntities().put(entity.getModel(), newEntityList);
         }
+    }
+
+    public void processTerrain(Terrain terrain) {
+        terrainRenderer.getTerrains().add(terrain);
     }
 
     public void clear() {
@@ -85,6 +83,7 @@ public class RenderManager {
     }
 
     public void cleanUp() {
-        entityRender.cleanUp();
+        entityRenderer.cleanUp();
+        terrainRenderer.cleanUp();
     }
 }
