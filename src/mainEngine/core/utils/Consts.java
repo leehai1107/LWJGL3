@@ -11,6 +11,9 @@ public class Consts {
     public static final float MOUSE_SENSITIVE = 0.2f;
     public static final float SPECULAR_POWER = 10f;
 
+    public static final int MAX_SPOT_LIGHTS = 5;
+    public static final int MAX_POINT_LIGHTS = 5;
+
     public static final Vector4f DEFAULT_COLOUR = new Vector4f(1.0f,1.0f,1.0f,1.0f);
 
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.5f,0.5f,0.5f);

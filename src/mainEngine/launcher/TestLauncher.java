@@ -2,19 +2,21 @@ package mainEngine.launcher;
 
 import mainEngine.core.*;
 import mainEngine.core.Entities.Entity;
+import mainEngine.core.Entities.Material;
 import mainEngine.core.Entities.Model;
 import mainEngine.core.Entities.Texture;
+import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;
 import mainEngine.core.lighting.SpotLight;
+import mainEngine.core.rendering.RenderManager;
 import mainEngine.core.utils.Consts;
 import org.joml.Math;
 import org.joml.Random;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class TestLauncher implements ILogic {
     private final WindowManager window;
 
     private List<Entity> entities;
+    private List<Terrain> terrains;
     private Camera camera;
 
     Vector3f cameraInc;
@@ -51,6 +54,13 @@ public class TestLauncher implements ILogic {
 
         Model model = loader.loadOBJModel("/res/cube.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
+
+        terrains = new ArrayList<>();
+        Terrain terrain = new Terrain(new Vector3f(0,-1,-800), loader , new Material(new Texture(loader.loadTexture("textures/grass.png")),0.1f));
+        Terrain terrain1 = new Terrain(new Vector3f(-800,-1,-800), loader , new Material(new Texture(loader.loadTexture("textures/flower.png")),0.1f));
+
+        terrains.add(terrain);
+        terrains.add(terrain1);
 
         entities = new ArrayList<>();
         Random rnd = new Random();
@@ -170,6 +180,9 @@ public class TestLauncher implements ILogic {
 
         for(Entity entity : entities) {
             renderer.processEntity(entity);
+        }
+        for (Terrain terrain : terrains) {
+            renderer.processTerrain(terrain);
         }
 
     }
