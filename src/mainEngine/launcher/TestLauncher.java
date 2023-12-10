@@ -42,8 +42,10 @@ public class TestLauncher implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        Model model = loader.loadOBJModel("/res/cube.obj");
-        model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
+        Model model = loader.loadOBJModel("/res/fern.obj");
+        model.setTexture(new Texture(loader.loadTexture("textures/fern.png")), 1f);
+
+        model.getMaterial().setDisableCulling(true);
 
         Terrain terrain = new Terrain(new Vector3f(0,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/grass.png")),0.1f));
         Terrain terrain1 = new Terrain(new Vector3f(-800,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/flower.png")),0.1f));

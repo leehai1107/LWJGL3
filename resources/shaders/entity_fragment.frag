@@ -54,6 +54,9 @@ vec4 specularC;
 void setupColours(Material material, vec2 textCoords) {
     if (material.hasTexture == 1) {
         ambientC = texture(textureSampler, textCoords);
+        if(ambientC.a <0.5){
+            discard;
+        }
         diffuseC = ambientC;
         specularC = ambientC;
     } else {
