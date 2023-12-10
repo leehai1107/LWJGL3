@@ -2,6 +2,7 @@ package mainEngine.core.rendering;
 
 import mainEngine.core.Camera;
 import mainEngine.core.Entities.Entity;
+import mainEngine.core.Entities.ScenceManager;
 import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.ShaderManager;
 import mainEngine.core.WindowManager;
@@ -50,7 +51,7 @@ public class RenderManager {
 
     }
 
-    public void render(Camera camera, DirectionalLight directionalLight, PointLight[] pointLights, SpotLight[] spotLights) {
+    public void render(Camera camera, ScenceManager scenceManager) {
         clear();
 
         if (window.isResize()) {
@@ -58,8 +59,8 @@ public class RenderManager {
             window.setResize(true);
         }
 
-        entityRenderer.render(camera, pointLights, spotLights, directionalLight);
-        terrainRenderer.render(camera,pointLights,spotLights,directionalLight);
+        entityRenderer.render(camera, scenceManager.getPointLights(), scenceManager.getSpotLights(), scenceManager.getDirectionalLight());
+        terrainRenderer.render(camera,scenceManager.getPointLights(), scenceManager.getSpotLights(), scenceManager.getDirectionalLight());
 
     }
 

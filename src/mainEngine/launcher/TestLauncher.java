@@ -1,10 +1,7 @@
 package mainEngine.launcher;
 
 import mainEngine.core.*;
-import mainEngine.core.Entities.Entity;
-import mainEngine.core.Entities.Material;
-import mainEngine.core.Entities.Model;
-import mainEngine.core.Entities.Texture;
+import mainEngine.core.Entities.*;
 import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.lighting.DirectionalLight;
@@ -23,21 +20,14 @@ import java.util.List;
 
 public class TestLauncher implements ILogic {
 
-    private static final float CAMERA_MOVE_SPEED = 0.025f;
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
-
-    private List<Entity> entities;
-    private List<Terrain> terrains;
     private Camera camera;
 
     Vector3f cameraInc;
 
-    private float lightAngle, spotAngle = 0, spotInc = 1;
-    private DirectionalLight directionalLight;
-    private PointLight[] pointLights;
-    private SpotLight[] spotLights;
+  private ScenceManager scenceManager;
 
     public TestLauncher() {
         renderer = new RenderManager();
@@ -45,7 +35,7 @@ public class TestLauncher implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, -90);
-        lightAngle = -90;
+        scenceManager = new ScenceManager(-90);
     }
 
     @Override
@@ -55,24 +45,21 @@ public class TestLauncher implements ILogic {
         Model model = loader.loadOBJModel("/res/cube.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
 
-        terrains = new ArrayList<>();
-        Terrain terrain = new Terrain(new Vector3f(0,-1,-800), loader , new Material(new Texture(loader.loadTexture("textures/grass.png")),0.1f));
-        Terrain terrain1 = new Terrain(new Vector3f(-800,-1,-800), loader , new Material(new Texture(loader.loadTexture("textures/flower.png")),0.1f));
+        Terrain terrain = new Terrain(new Vector3f(0,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/grass.png")),0.1f));
+        Terrain terrain1 = new Terrain(new Vector3f(-800,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/flower.png")),0.1f));
 
-        terrains.add(terrain);
-        terrains.add(terrain1);
+        scenceManager.addTerrain(terrain);
+        scenceManager.addTerrain(terrain1);
 
-        entities = new ArrayList<>();
         Random rnd = new Random();
         for (int i = 0;i<200;i++) {
-            float x = rnd.nextFloat() * 100 -50;
-            float y = rnd.nextFloat() * 100 -50;
-            float z = rnd.nextFloat() * -300;
-            entities.add(new Entity(model, new Vector3f(x,y,z),
+            float x = rnd.nextFloat() * 800;
+            float z = rnd.nextFloat() * -800;
+            scenceManager.addEntity(new Entity(model, new Vector3f(x,2,z),
                     new Vector3f(rnd.nextFloat()*180,rnd.nextFloat() *180,0),
                     1));
         }
-        entities.add(new Entity(model,new Vector3f(0,0,-2f),new Vector3f(0,0,0),1));
+        scenceManager.addEntity(new Entity(model,new Vector3f(0,2,-5f),new Vector3f(0,0,0),1));
 
         float lightIntensity = 1.0f;
         //point light
@@ -81,23 +68,27 @@ public class TestLauncher implements ILogic {
         PointLight pointLight = new PointLight(lightColour, lightPosition, lightIntensity, 0, 0, 1);
 
         //spotlight
-        Vector3f coneDir = new Vector3f(0, 0, 0);
-        float cutoff = Math.cos(Math.toRadians(180));
-        SpotLight spotLight = new SpotLight(new PointLight(lightColour, new Vector3f(0, 0, -3.6f),
+        Vector3f coneDir = new Vector3f(0, -50, 0);
+        float cutoff = Math.cos(Math.toRadians(140));
+
+        lightIntensity = 5000f;
+        SpotLight spotLight = new SpotLight(new PointLight(new Vector3f(0.25f,0f,0f), new Vector3f(1f, 50f, -5f),
+                lightIntensity, 0, 0, 0.2f), coneDir, cutoff);
+        lightIntensity = 5000f;
+        SpotLight spotLight1 =new SpotLight(new PointLight(new Vector3f(0f,0.25f,0f), new Vector3f(1f, 50f, -5f),
                 lightIntensity, 0, 0, 0.2f), coneDir, cutoff);
 
-        SpotLight spotLight1 = new SpotLight(new PointLight(lightColour, lightPosition,
-                lightIntensity, 0, 0, 1), coneDir, cutoff);
-        spotLight1.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, -3.6f));
 
 
         //directional light
+        lightIntensity = 1f;
+
         lightPosition = new Vector3f(-1, -10, 0);
         lightColour = new Vector3f(1, 1, 1);
-        directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
-
-        pointLights = new PointLight[]{pointLight};
-        spotLights = new SpotLight[]{spotLight, spotLight1};
+        scenceManager.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, lightIntensity));
+        scenceManager.setPointLights(new PointLight[]{pointLight});
+        scenceManager.setSpotLights(new SpotLight[]{spotLight, spotLight1});
+        camera.setPosition(0,5,0);
     }
 
     @Override
@@ -123,21 +114,21 @@ public class TestLauncher implements ILogic {
 //        if (window.isKeyPress(GLFW.GLFW_KEY_P))
 //            pointLight.getPosition().x -= 0.1f;
 
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
+        float lightPos = scenceManager.getSpotLights()[0].getPointLight().getPosition().z;
         if (window.isKeyPress(GLFW.GLFW_KEY_N)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
+            scenceManager.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
         if (window.isKeyPress(GLFW.GLFW_KEY_M)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
+            scenceManager.getSpotLights()[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
 
     }
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED,
-                cameraInc.y * CAMERA_MOVE_SPEED,
-                cameraInc.z * CAMERA_MOVE_SPEED);
+        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVE_SPEED,
+                cameraInc.y * Consts.CAMERA_MOVE_SPEED,
+                cameraInc.z * Consts.CAMERA_MOVE_SPEED);
 
         if (mouseInput.isLeftButtonPress()) {
 
@@ -147,41 +138,48 @@ public class TestLauncher implements ILogic {
 
 //        entity.incRotation(0.0f,0.25f,0.0f);
 
-        spotAngle += spotInc * 0.05f;
-        if (spotAngle > 4)
-            spotInc = -1;
-        else if (spotAngle <= -4)
-            spotInc = 1;
+        scenceManager.incSpotAngle(0.15f);
 
-        double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLights[0].getPointLight().getPosition();
+        if (scenceManager.getSpotAngle() > 4)
+            scenceManager.setSpotInc(-1);
+        else if (scenceManager.getSpotAngle() <= -4)
+            scenceManager.setSpotInc(1);
+
+        double spotAngleRad = Math.toRadians(scenceManager.getSpotAngle());
+        Vector3f coneDir = scenceManager.getSpotLights()[0].getPointLight().getPosition();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
-        lightAngle += 0.5f;
-        if (lightAngle > 90) {
-            directionalLight.setIntensity(0);
-            if (lightAngle >= 360)
-                lightAngle = -90;
-        } else if (lightAngle <= -80 || lightAngle >= 80) {
-            float factor = 1 - (float) (Math.abs(lightAngle) - 80) / 10.0f;
-            directionalLight.setIntensity(factor);
-            directionalLight.getColour().y = Math.max(factor, 0.9f);
-            directionalLight.getColour().z = Math.max(factor, 0.5f);
+
+        coneDir = scenceManager.getSpotLights()[1].getPointLight().getPosition();
+        coneDir.x = (float) Math.cos(spotAngleRad);
+
+        scenceManager.incLightAngle(1.1f);
+
+        scenceManager.setLightAngle(scenceManager.getLightAngle()+1f);
+        if (scenceManager.getLightAngle() > 90) {
+            scenceManager.getDirectionalLight().setIntensity(0);
+            if (scenceManager.getLightAngle() >= 360)
+                scenceManager.setLightAngle(-90);
+        } else if (scenceManager.getLightAngle() <= -80 || scenceManager.getLightAngle() >= 80) {
+            float factor = 1 - (float) (Math.abs(scenceManager.getLightAngle()) - 80) / 10.0f;
+            scenceManager.getDirectionalLight().setIntensity(factor);
+            scenceManager.getDirectionalLight().getColour().y = Math.max(factor, 0.9f);
+            scenceManager.getDirectionalLight().getColour().z = Math.max(factor, 0.5f);
         } else {
-            directionalLight.setIntensity(1);
-            directionalLight.getColour().x = 1;
-            directionalLight.getColour().y = 1;
-            directionalLight.getColour().z = 1;
+            scenceManager.getDirectionalLight().setIntensity(1);
+            scenceManager.getDirectionalLight().getColour().x = 1;
+            scenceManager.getDirectionalLight().getColour().y = 1;
+            scenceManager.getDirectionalLight().getColour().z = 1;
         }
 
-        double angRad = Math.toRadians(lightAngle);
-        directionalLight.getDirection().x = (float) Math.sin(angRad);
-        directionalLight.getDirection().y = (float) Math.cos(angRad);
+        double angRad = Math.toRadians(scenceManager.getLightAngle());
+        scenceManager.getDirectionalLight().getDirection().x = (float) Math.sin(angRad);
+        scenceManager.getDirectionalLight().getDirection().y = (float) Math.cos(angRad);
 
-        for(Entity entity : entities) {
+        for(Entity entity : scenceManager.getEntities()) {
             renderer.processEntity(entity);
         }
-        for (Terrain terrain : terrains) {
+        for (Terrain terrain : scenceManager.getTerrains()) {
             renderer.processTerrain(terrain);
         }
 
@@ -189,7 +187,7 @@ public class TestLauncher implements ILogic {
 
     @Override
     public void render() {
-        renderer.render(camera, directionalLight, pointLights, spotLights);
+        renderer.render(camera, scenceManager);
     }
 
     @Override
