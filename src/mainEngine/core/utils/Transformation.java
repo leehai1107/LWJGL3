@@ -1,6 +1,6 @@
 package mainEngine.core.utils;
 
-import mainEngine.core.Camera;
+import mainEngine.core.Entities.camera.Camera;
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.terrain.Terrain;
 import org.joml.Math;

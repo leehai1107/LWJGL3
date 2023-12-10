@@ -1,6 +1,6 @@
 package mainEngine.core.rendering;
 
-import mainEngine.core.Camera;
+import mainEngine.core.Entities.camera.Camera;
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.ScenceManager;
 import mainEngine.core.Entities.terrain.Terrain;
