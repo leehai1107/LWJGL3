@@ -1,7 +1,6 @@
 package mainEngine.core.rendering;
 
-import mainEngine.core.Camera;
-import mainEngine.core.Entities.Entity;
+import mainEngine.core.Entities.camera.Camera;
 import mainEngine.core.Entities.Model;
 import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.ShaderManager;
@@ -18,9 +17,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TerrainRenderer implements IRenderer {
 

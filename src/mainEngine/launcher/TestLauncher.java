@@ -2,6 +2,8 @@ package mainEngine.launcher;
 
 import mainEngine.core.*;
 import mainEngine.core.Entities.*;
+import mainEngine.core.Entities.camera.Camera;
+import mainEngine.core.Entities.player.Player;
 import mainEngine.core.Entities.terrain.Terrain;
 import mainEngine.core.Loader.ObjectLoader;
 import mainEngine.core.lighting.DirectionalLight;
@@ -15,9 +17,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TestLauncher implements ILogic {
 
     private final RenderManager renderer;
@@ -25,16 +24,19 @@ public class TestLauncher implements ILogic {
     private final WindowManager window;
     private Camera camera;
 
-    Vector3f cameraInc;
+    Vector3f cameraMovement;
+    Player player;
 
-  private ScenceManager scenceManager;
+
+    private ScenceManager scenceManager;
 
     public TestLauncher() {
         renderer = new RenderManager();
         window = Launcher.getWindow();
         loader = new ObjectLoader();
         camera = new Camera();
-        cameraInc = new Vector3f(0, 0, -90);
+
+        cameraMovement = new Vector3f(0, 0, -90);
         scenceManager = new ScenceManager(-90);
     }
 
@@ -42,24 +44,32 @@ public class TestLauncher implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        Model model = loader.loadOBJModel("/res/cube.obj");
-        model.setTexture(new Texture(loader.loadTexture("textures/grassblock.png")), 1f);
+        Model model = loader.loadOBJModel("/res/fern.obj");
+        model.setTexture(new Texture(loader.loadTexture("textures/fern.png")), 1f);
 
-        Terrain terrain = new Terrain(new Vector3f(0,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/grass.png")),0.1f));
-        Terrain terrain1 = new Terrain(new Vector3f(-800,1,-800), loader , new Material(new Texture(loader.loadTexture("textures/flower.png")),0.1f));
+        model.getMaterial().setDisableCulling(true);
+
+        Terrain terrain = new Terrain(new Vector3f(0, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/grass.png")), 0.1f));
+        Terrain terrain1 = new Terrain(new Vector3f(-800, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/flower.png")), 0.1f));
 
         scenceManager.addTerrain(terrain);
         scenceManager.addTerrain(terrain1);
 
+        Model playerModel = loader.loadOBJModel("/res/bunny.obj");
+        playerModel.setTexture(new Texture(loader.loadTexture("textures/grass.png")), 1f);
+
+        player = new Player(playerModel,new Vector3f(0, 2, -5f), new Vector3f(0, 0, 0), 1);
+
         Random rnd = new Random();
-        for (int i = 0;i<200;i++) {
-            float x = rnd.nextFloat() * 800;
-            float z = rnd.nextFloat() * -800;
-            scenceManager.addEntity(new Entity(model, new Vector3f(x,2,z),
-                    new Vector3f(rnd.nextFloat()*180,rnd.nextFloat() *180,0),
-                    1));
-        }
-        scenceManager.addEntity(new Entity(model,new Vector3f(0,2,-5f),new Vector3f(0,0,0),1));
+//        for (int i = 0; i < 200; i++) {
+//            float x = rnd.nextFloat() * 800;
+//            float z = rnd.nextFloat() * -800;
+//            scenceManager.addEntity(new Entity(model, new Vector3f(x, 2, z),
+//                    new Vector3f(rnd.nextFloat() * 180, rnd.nextFloat() * 180, 0),
+//                    1));
+//        }
+//        scenceManager.addEntity(new Entity(model, new Vector3f(0, 2, -5f), new Vector3f(0, 0, 0), 1));
+        scenceManager.addEntity(player);
 
         float lightIntensity = 1.0f;
         //point light
@@ -72,12 +82,11 @@ public class TestLauncher implements ILogic {
         float cutoff = Math.cos(Math.toRadians(140));
 
         lightIntensity = 5000f;
-        SpotLight spotLight = new SpotLight(new PointLight(new Vector3f(0.25f,0f,0f), new Vector3f(1f, 50f, -5f),
+        SpotLight spotLight = new SpotLight(new PointLight(new Vector3f(0.25f, 0f, 0f), new Vector3f(1f, 50f, -5f),
                 lightIntensity, 0, 0, 0.2f), coneDir, cutoff);
         lightIntensity = 5000f;
-        SpotLight spotLight1 =new SpotLight(new PointLight(new Vector3f(0f,0.25f,0f), new Vector3f(1f, 50f, -5f),
+        SpotLight spotLight1 = new SpotLight(new PointLight(new Vector3f(0f, 0.25f, 0f), new Vector3f(1f, 50f, -5f),
                 lightIntensity, 0, 0, 0.2f), coneDir, cutoff);
-
 
 
         //directional light
@@ -88,27 +97,11 @@ public class TestLauncher implements ILogic {
         scenceManager.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, lightIntensity));
         scenceManager.setPointLights(new PointLight[]{pointLight});
         scenceManager.setSpotLights(new SpotLight[]{spotLight, spotLight1});
-        camera.setPosition(0,5,0);
+        camera.setPosition(0, 5, 0);
     }
 
     @Override
     public void input() {
-        cameraInc.set(0, 0, 0);
-        if (window.isKeyPress(GLFW.GLFW_KEY_W))
-            cameraInc.z = -1;
-        if (window.isKeyPress(GLFW.GLFW_KEY_S))
-            cameraInc.z = 1;
-
-        if (window.isKeyPress(GLFW.GLFW_KEY_A))
-            cameraInc.x = -1;
-        if (window.isKeyPress(GLFW.GLFW_KEY_D))
-            cameraInc.x = 1;
-
-        if (window.isKeyPress(GLFW.GLFW_KEY_Z))
-            cameraInc.y = -1;
-        if (window.isKeyPress(GLFW.GLFW_KEY_X))
-            cameraInc.y = 1;
-
 //        if (window.isKeyPress(GLFW.GLFW_KEY_O))
 //            pointLight.getPosition().x += 0.1f;
 //        if (window.isKeyPress(GLFW.GLFW_KEY_P))
@@ -126,9 +119,9 @@ public class TestLauncher implements ILogic {
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        camera.movePosition(cameraInc.x * Consts.CAMERA_MOVE_SPEED,
-                cameraInc.y * Consts.CAMERA_MOVE_SPEED,
-                cameraInc.z * Consts.CAMERA_MOVE_SPEED);
+        camera.movePosition(window);
+        player.move(window);
+        player.incRotation(0.0f,0.25f,0.0f);
 
         if (mouseInput.isLeftButtonPress()) {
 
@@ -155,7 +148,7 @@ public class TestLauncher implements ILogic {
 
         scenceManager.incLightAngle(1.1f);
 
-        scenceManager.setLightAngle(scenceManager.getLightAngle()+1f);
+        scenceManager.setLightAngle(scenceManager.getLightAngle() + 1f);
         if (scenceManager.getLightAngle() > 90) {
             scenceManager.getDirectionalLight().setIntensity(0);
             if (scenceManager.getLightAngle() >= 360)
@@ -176,7 +169,8 @@ public class TestLauncher implements ILogic {
         scenceManager.getDirectionalLight().getDirection().x = (float) Math.sin(angRad);
         scenceManager.getDirectionalLight().getDirection().y = (float) Math.cos(angRad);
 
-        for(Entity entity : scenceManager.getEntities()) {
+
+        for (Entity entity : scenceManager.getEntities()) {
             renderer.processEntity(entity);
         }
         for (Terrain terrain : scenceManager.getTerrains()) {

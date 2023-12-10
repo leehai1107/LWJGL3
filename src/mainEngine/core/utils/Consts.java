@@ -18,5 +18,8 @@ public class Consts {
 
     public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.5f, 0.5f, 0.5f);
 
+    public static final float PLAYER_RUN_SPEED = 20;
+    public static final float PLAYER_TURN_SPEED = 160;
+
 
 }

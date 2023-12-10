@@ -1,6 +1,6 @@
 package mainEngine.core.rendering;
 
-import mainEngine.core.Camera;
+import mainEngine.core.Entities.camera.Camera;
 import mainEngine.core.Entities.Model;
 import mainEngine.core.lighting.DirectionalLight;
 import mainEngine.core.lighting.PointLight;

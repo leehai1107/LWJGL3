@@ -1,6 +1,6 @@
 package mainEngine.core.rendering;
 
-import mainEngine.core.Camera;
+import mainEngine.core.Entities.camera.Camera;
 import mainEngine.core.Entities.Entity;
 import mainEngine.core.Entities.ScenceManager;
 import mainEngine.core.Entities.terrain.Terrain;
@@ -22,6 +22,8 @@ public class RenderManager {
 
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;
+
+    private static boolean isCulling = false;
 
     public RenderManager() {
         window = Launcher.getWindow();
@@ -62,6 +64,21 @@ public class RenderManager {
         entityRenderer.render(camera, scenceManager.getPointLights(), scenceManager.getSpotLights(), scenceManager.getDirectionalLight());
         terrainRenderer.render(camera,scenceManager.getPointLights(), scenceManager.getSpotLights(), scenceManager.getDirectionalLight());
 
+    }
+
+    public static void enableCulling() {
+        if(!isCulling) {
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            GL11.glCullFace(GL11.GL_BACK);
+            isCulling = true;
+        }
+    }
+
+    public static void disableCulling() {
+        if(isCulling) {
+            GL11.glDisable(GL11.GL_CULL_FACE);
+            isCulling = false;
+        }
     }
 
     public void processEntity(Entity entity) {
